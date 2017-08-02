@@ -30,11 +30,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import static com.shubham.findyourway.Start.lat;
+import static com.shubham.findyourway.Start.lng;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
-    public static double lat = 22.6928, lng = 75.8684;
-    LocationManager locationManager;
-    Button nearbybtn, path, geopath;
+
+public class MainActivity extends AppCompatActivity {
+    Button route;
     EditText e3, e4;
     TextView txtv;
     static double arr3[];
@@ -49,99 +50,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (isonline()) {
-            nearbybtn = (Button) findViewById(R.id.result);
-            geopath = (Button) findViewById(R.id.geopath);
-          //  path = (Button) findViewById(R.id.path);
-            e3 = (EditText) findViewById(R.id.e3);
+        route = (Button) findViewById(R.id.geopath);
+        e3 = (EditText) findViewById(R.id.e3);
             e4 = (EditText) findViewById(R.id.e4);
+            Log.e("abc","main activity");
             txtv = (TextView) findViewById(R.id.textView);
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, MainActivity.this);
-        } else {
-            Toast.makeText(this, "No internet connection, Try again...", Toast.LENGTH_LONG).show();
-        }
 
-        nearbybtn.setOnClickListener(new View.OnClickListener() {
+        route.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                geourl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&key=AIzaSyDRWyAwiJOnvaxbaz_qXdYODLDpjGj5IEk";
-
-                final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-                progressDialog.setMessage("loading geocode...");
-                progressDialog.setCancelable(false);
-                progressDialog.show();
-                RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-
-
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, geourl,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                Log.e("main", "135" + geourl);
-                                address = LatAddressParser.parseResult(response);
-                                progressDialog.dismiss();
-                                Intent intent = new Intent(MainActivity.this, nearby.class);
-                                intent.putExtra("lat", "" + lat);
-                                intent.putExtra("lng", "" + lng);
-                                intent.putExtra("address", address);
-                                startActivity(intent);
-
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("error", "volley");
-                        error.printStackTrace();
-                        progressDialog.dismiss();
-                        Toast.makeText(MainActivity.this, "No records Found", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                queue.add(stringRequest);
-
-
-            }
-        });
-     /*   path.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-                progressDialog.setMessage("loading location...");
-                progressDialog.setCancelable(false);
-                progressDialog.show();
-                RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-
-
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                String a = LatAddressParser.parseResult(response);
-                                progressDialog.dismiss();
-
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("error", "volley");
-                        progressDialog.dismiss();
-                        Toast.makeText(MainActivity.this, "No records Found", Toast.LENGTH_SHORT).show();
-                    }
-                });
-// Add the request to the RequestQueue.
-                queue.add(stringRequest);
-
-
-            }
-        });
-     */
-        geopath.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                Log.e("click","1");
                 if (e3.getText().length() > 0 && e4.getText().length() > 0) {
+                    Log.e("click","2");
                     char arrr1[]=(e3.getText()+"+"+e4.getText()).toCharArray();
                     destinationaddress="";
                     for(char a:arrr1){
@@ -154,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     geourl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "&key=AIzaSyDRWyAwiJOnvaxbaz_qXdYODLDpjGj5IEk";
 
                     final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-                    progressDialog.setMessage("loading geocode...");
+                    progressDialog.setMessage("Loading Address...");
                     progressDialog.setCancelable(false);
                     progressDialog.show();
                     RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
@@ -171,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                     distanceurl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + address + "&destination=" + destinationaddress + "&mode=walking&key=AIzaSyDRWyAwiJOnvaxbaz_qXdYODLDpjGj5IEk";
                                     Log.e("abc", distanceurl);
                                     final ProgressDialog progressDialog1 = new ProgressDialog(MainActivity.this);
-                                    progressDialog1.setMessage("loading direction...");
+                                    progressDialog1.setMessage("Loading Direction...");
                                     progressDialog1.setCancelable(false);
                                     progressDialog1.show();
 
@@ -190,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                                     distanceurl = "https://maps.googleapis.com/maps/api/directions/json?origin=" + destinationaddress + "&destination=" + address + "&mode=walking&key=AIzaSyDRWyAwiJOnvaxbaz_qXdYODLDpjGj5IEk";
                                                     Log.e("abcd", distanceurl);
                                                     final ProgressDialog progressDialog2 = new ProgressDialog(MainActivity.this);
-                                                    progressDialog2.setMessage("loading direction...");
+                                                    progressDialog2.setMessage("Loading Direction...");
                                                     progressDialog2.setCancelable(false);
                                                     progressDialog2.show();
 
@@ -216,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                                                         Roadurl = "https://roads.googleapis.com/v1/snapToRoads?path=" + distanceString + "&interpolate=true&key=AIzaSyDRWyAwiJOnvaxbaz_qXdYODLDpjGj5IEk";
                                                                         //String Roadurl = "https://roads.googleapis.com/v1/snapToRoads?path=22.6902136,75.83754170000002|22.6837843,75.8357721|22.6827764,75.8549299|22.6831425,75.8571004|22.6986401,75.877746|22.6929375,75.86830719999999&interpolate=true&key=AIzaSyDRWyAwiJOnvaxbaz_qXdYODLDpjGj5IEk";
                                                                         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-                                                                        progressDialog.setMessage("loading roadpath...");
+                                                                        progressDialog.setMessage("Generating Path...");
                                                                         progressDialog.setCancelable(false);
                                                                         progressDialog.show();
 
@@ -242,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                                                                 Log.e("error", "volley2");
                                                                                 error.printStackTrace();
                                                                                 progressDialog.dismiss();
-                                                                                Toast.makeText(MainActivity.this, "No records Found2", Toast.LENGTH_SHORT).show();
+                                                                                Toast.makeText(MainActivity.this, "Internet Connection Error", Toast.LENGTH_SHORT).show();
                                                                             }
                                                                         });
                                                                         queue3.add(stringRequest3);
@@ -281,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                                                                 Log.e("error", "volley2");
                                                                                 error.printStackTrace();
                                                                                 progressDialog.dismiss();
-                                                                                Toast.makeText(MainActivity.this, "No records Found2", Toast.LENGTH_SHORT).show();
+                                                                                Toast.makeText(MainActivity.this, "Internet Connection Error", Toast.LENGTH_SHORT).show();
                                                                             }
                                                                         });
                                                                         queue3.add(stringRequest3);
@@ -296,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                                             Log.e("error", "volley2");
                                                             error.printStackTrace();
                                                             progressDialog2.dismiss();
-                                                            Toast.makeText(MainActivity.this, "No records Found2", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(MainActivity.this, "Internet Connection Error", Toast.LENGTH_SHORT).show();
                                                         }
                                                     });
                                                     queue2.add(stringRequest2);
@@ -309,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                             Log.e("error", "volley2");
                                             error.printStackTrace();
                                             progressDialog1.dismiss();
-                                            Toast.makeText(MainActivity.this, "No records Found2", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MainActivity.this, "Internet Connection Error", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                     queue1.add(stringRequest1);
@@ -322,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             Log.e("error", "volley");
                             error.printStackTrace();
                             progressDialog.dismiss();
-                            Toast.makeText(MainActivity.this, "No records Found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Internet Connection Error", Toast.LENGTH_SHORT).show();
                         }
                     });
                     queue.add(stringRequest);
@@ -338,63 +258,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        lat = location.getLatitude();
-        lng = location.getLongitude();
-        Log.e("method", "latlng");
-        Toast.makeText(this, "location changed........", Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    public boolean isonline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-            return true;
-        } else {
-            return false;
-        }
 
 
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder alertBuilder= new AlertDialog.Builder(MainActivity.this);
-        alertBuilder.setTitle("Confirmation Message");
-        alertBuilder.setMessage("Do you want to exit?");
-        alertBuilder.setPositiveButton("Yes",new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int which){
-                Toast.makeText(MainActivity.this,"Positive Confirmation", Toast.LENGTH_LONG).show();
-                System.exit(0);
-                dialog.cancel();
-            }
-        });
-        alertBuilder.setNegativeButton("No",new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface dialog, int which){
-                Toast.makeText(MainActivity.this,"Negative Confirmation",Toast.LENGTH_LONG).show();
-                dialog.cancel();
-            }
-        });
-        AlertDialog ad=alertBuilder.create();
-        ad.show();
-
-    }
 }
 
 

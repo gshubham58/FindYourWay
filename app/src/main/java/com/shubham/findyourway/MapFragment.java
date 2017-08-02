@@ -38,8 +38,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         gmap.setIndoorEnabled(true);
         gmap.setBuildingsEnabled(true);
         gmap.getUiSettings().setZoomControlsEnabled(true);
-        LatLng latLng=new LatLng(MainActivity.lat,MainActivity.lng);
-        gmap.addMarker(new MarkerOptions().position(new LatLng(MainActivity.lat,MainActivity.lng)));
+        LatLng latLng=new LatLng(Start.lat,Start.lng);
+        gmap.addMarker(new MarkerOptions().position(new LatLng(Start.lat,Start.lng)));
         gmap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         gmap.getMaxZoomLevel();
     }
